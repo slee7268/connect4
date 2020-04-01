@@ -86,6 +86,17 @@ class Board:
                 display[i, j] = self.board[i, j].color
         return display
 
+    def checkFull(self, col):
+        # check to see if column is full
+        pieceCounter = 0
+        for i in range(0, 6):
+            if self.board[i, col].color!= "null":
+                pieceCounter = pieceCounter + 1
+
+        if pieceCounter == 6:
+            return True
+        else:
+            return False
     def addPiece(self, col, piece):
         i = 5
         while self.board[i, col].color != "null":
@@ -118,8 +129,12 @@ class Game:
         moves = 0
         while not winner:
             player = next(iterator)
-
             piece, pos = self.playMove(player)
+
+            while(self.board.checkFull(pos) == True):
+                print("whups that column is already full. Try again")
+                piece, pos = self.playMove(player)
+
             self.board.addPiece(pos, piece)
             print(self.board.displayBoard())
             moves = moves + 1
@@ -129,6 +144,37 @@ class Game:
 
     def playGame(self):
         print("Let's play Connect4!!")
+        player1 = input("Player 1, Enter your name: ")
+        player2 = input("Player 2, Enter your name: ")
+        winner = False
+        iterator = itertools.cycle(range(2))
+        moves = 0
+        while not winner:
+            player = next(iterator)
+            if player==0:
+                print("Player 1, It is your turn!")
+                col = input("Player 1, Please enter the column number (0 based indexing) that you'd like to play: ")
+                piece = Piece("red")
+                col = int(col)
+                while self.board.checkFull(col) == True:
+                    col = input("Sorry, that was an invalid move. Try again: ")
+                    col = int(col)
+                self.board.addPiece(col, piece)
+                moves = moves +1
+                print(self.board.displayBoard())
+                winner = self.checkWin()
+            elif player ==1:
+                print("Player 2, It is your turn!")
+                col = input("Player 2, Please enter the column number (0 based indexing) that you'd like to play: ")
+                piece = Piece("black")
+                col = int(col)
+                while self.board.checkFull(col) == True:
+                    col = input("Sorry that was an invalid move. Try again: ")
+                    col = int(col)
+                self.board.addPiece(col, piece)
+                moves = moves + 1
+                print(self.board.displayBoard())
+                winner = self.checkWin()
         return
 
     def checkWin(self):
@@ -136,6 +182,8 @@ class Game:
         rowRed, rowBlack, colRed, colBlack, diagRed, diagBlack = 0, 0, 0, 0, 0, 0
         #count consecutively by row and then by column
         for i in range(0, 6):
+            rowRed = 0
+            rowBlack =0
             for j in range(0, 7):
                 if display[i, j]== "red":
                     rowBlack = 0
@@ -153,6 +201,8 @@ class Game:
                     rowRed = 0
                     rowBlack = 0
         for k in range(0, 7):
+            colBlack = 0
+            colRed = 0
             for l in range(0, 6):
                 if display[l, k] == "red":
                     colBlack = 0
@@ -203,15 +253,12 @@ board = Board()
 game = Game(board)
 # print(game.playRando())
 piece = Piece("red")
-#game.board.addPiece(2, piece)
-#game.board.addPiece(2, piece)
-# print(game.board.returnPiece(5, 2).neighbor)
 
-print(game.board.displayBoard())
 game.playRando()
+
+newBoard = Board()
+game2 = Game(newBoard)
+game2.playGame()
 testDisplay = game.board.displayBoard()
 
-test = np.zeros((6, 7))
-
 # things to do. Figure out a way to prettify the board when displaying
-# add neighbors to the initialized pieces
