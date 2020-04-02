@@ -85,6 +85,12 @@ class Board:
             for j in range(0, 7):
                 display[i, j] = self.board[i, j].color
         return display
+    def getLegalMoves(self):
+        legalMoves = []
+        for i in range(0, 7):
+            if self.checkFull(i)==False:
+                legalMoves.append(i)
+        return legalMoves
 
     def checkFull(self, col):
         # check to see if column is full
@@ -97,12 +103,22 @@ class Board:
             return True
         else:
             return False
+    def checkFullBoard(self):
+
+        for i in range(0, 6):
+            for j in range(0, 7):
+                if self.board[i, j].color=="null":
+                    return False
+        return True
+
     def addPiece(self, col, piece):
         i = 5
         while self.board[i, col].color != "null":
             i = i - 1
         piece.neighbor = self.board[i, col].neighbor
         self.board[i, col] = piece
+
+
         return
 
     def returnPiece(self, x, y):
@@ -110,10 +126,17 @@ class Board:
 
 
 class Game:
-    def __init__(self, board):
+    def __init__(self, board, turn=0):
         self.board = board
+        self.turn = turn
+    def playMove(self, player, pos):
+        if player == 0:
+            piece = Piece("red")
+        else:
+            piece = Piece("black")
+        return piece, pos
 
-    def playMove(self, player):
+    def playRandomMove(self, player):
         #print(player)
         if player == 0:
             piece = Piece("red")
@@ -129,18 +152,24 @@ class Game:
         moves = 0
         while not winner:
             player = next(iterator)
-            piece, pos = self.playMove(player)
-
+            piece, pos = self.playRandomMove(player)
+            if(self.board.checkFullBoard()):
+                print("it's a draw")
+                return
             while(self.board.checkFull(pos) == True):
                 print("whups that column is already full. Try again")
-                piece, pos = self.playMove(player)
+                piece, pos = self.playRandomMove(player)
 
             self.board.addPiece(pos, piece)
+            if self.turn ==0:
+                self.turn = 1
+            else:
+                self.turn = 0
             print(self.board.displayBoard())
             moves = moves + 1
             winner = self.checkWin()
         print("Number of moves: " + str(moves))
-        return
+        return self.board
 
     def playGame(self):
         print("Let's play Connect4!!")
@@ -156,11 +185,18 @@ class Game:
                 col = input("Player 1, Please enter the column number (0 based indexing) that you'd like to play: ")
                 piece = Piece("red")
                 col = int(col)
+                if self.board.checkFullBoard()==True:
+                    print("it's a draw")
+                    return
                 while self.board.checkFull(col) == True:
                     col = input("Sorry, that was an invalid move. Try again: ")
                     col = int(col)
                 self.board.addPiece(col, piece)
                 moves = moves +1
+                if self.turn == 0:
+                    self.turn = 1
+                else:
+                    self.turn = 0
                 print(self.board.displayBoard())
                 winner = self.checkWin()
             elif player ==1:
@@ -171,6 +207,10 @@ class Game:
                 while self.board.checkFull(col) == True:
                     col = input("Sorry that was an invalid move. Try again: ")
                     col = int(col)
+                if self.turn == 0:
+                    self.turn = 1
+                else:
+                    self.turn = 0
                 self.board.addPiece(col, piece)
                 moves = moves + 1
                 print(self.board.displayBoard())
@@ -246,19 +286,22 @@ class Game:
                     diagBlack = 0
         return False
 
+def test():
 
-board = Board()
-# board.displayBoard()
+    board = Board()
+    # board.displayBoard()
 
-game = Game(board)
-# print(game.playRando())
-piece = Piece("red")
+    game = Game(board)
+    game.playRando()
+    return
 
-game.playRando()
+def test2():
+    newBoard = Board()
+    game2 = Game(newBoard)
+    game2.playGame()
+    # print(game.playRando())
 
-newBoard = Board()
-game2 = Game(newBoard)
-game2.playGame()
-testDisplay = game.board.displayBoard()
+#test2()
+#testDisplay = game.board.displayBoard()
 
 # things to do. Figure out a way to prettify the board when displaying
