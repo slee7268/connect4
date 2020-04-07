@@ -25,6 +25,7 @@ class Piece:
 class Board:
     def __init__(self):
         self.board = np.empty(shape=(6, 7), dtype=object)
+        self.turn = 0
         for i in range(0, 6):
             for j in range(0, 7):
                 piece = Piece("null")
@@ -115,6 +116,8 @@ class Board:
         i = 5
         while self.board[i, col].color != "null":
             i = i - 1
+            if i<0:
+                print("uhoh")
         piece.neighbor = self.board[i, col].neighbor
         self.board[i, col] = piece
 
@@ -223,7 +226,7 @@ class Game:
         #count consecutively by row and then by column
         for i in range(0, 6):
             rowRed = 0
-            rowBlack =0
+            rowBlack = 0
             for j in range(0, 7):
                 if display[i, j]== "red":
                     rowBlack = 0
@@ -231,7 +234,7 @@ class Game:
                     if rowRed == 4:
                         print("Player Red wins by row")
                         return True
-                elif display[i, j]== "black":
+                elif display[i, j] == "black":
                     rowRed = 0
                     rowBlack = rowBlack + 1
                     if rowBlack == 4:
