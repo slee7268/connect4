@@ -25,12 +25,13 @@ class Node:
                 childNode = Node(newGame, 0, pos=pos, parent=startNode)
                 piece = Piece("red")
                 childNode.state.board.addPiece(pos, piece)
+                childNode.state.board.turn=1
                 startNode.child.append(childNode)
 
         while len(startNode.child) > 0:
             ucbList = []
             for child in startNode.child:
-                ucb =child.calcucb()
+                ucb = child.calcucb()
                 ucbList.append(ucb)
             maxpos = ucbList.index(max(ucbList))
             print(ucbList)
@@ -101,9 +102,9 @@ class Node:
             while node.parent is not None:
                 node.visit = node.visit + 1
                 node.games = node.games + 1
-                node.wins = node.wins + 1
+                node.wins = node.wins + 0.5
                 node = node.parent
-        win = self.state.board.turn #this person lost.
+        win = self.state.board.turn
         while node.parent is not None:
             #print("hi")
             if node.state.board.turn == win:
@@ -151,6 +152,8 @@ class MCTS:
             node = self.root
             #print(node.state.board.displayBoard())
             child = node.select()
+            #print("childboard")
+            #print(child.state.board.displayBoard())
             #print(child.state.board.displayBoard())
             print("expand")
             childNode = child.expand()
@@ -196,22 +199,22 @@ class MCTS:
             exploit.append(val)
         maxpos = exploit.index(max(exploit))
         choose = self.root.child[maxpos]
-        return maxpos
+        return choose
 
     def playMe(self):
         board = Board()
         game = Game(board)
         newMCTS = self
         while game.checkWin() != True:
-            newMCTS.simulate(700)
-            pos = newMCTS.best_action()
+            newMCTS.simulate(300)
+            choose = newMCTS.best_action()
+            pos = choose.pos
             piece = Piece("red")
             game.board.turn = 1
             game.board.addPiece(pos, piece)
             print(game.board.displayBoard())
-            if game.checkWin() == True:
+            if game.checkWin() is True:
                 break
-
             col = input("pick where you wanna play the piece")
             piece2 = Piece("black")
             game.board.turn = 0
@@ -230,11 +233,9 @@ game = Game(board)
 
 root = Node(game, 0)
 mcts = MCTS(root)
-#mcts.simulate(200)
+#mcts.simulate(100)
 #mcts.playRandom(0)
-#mcts.playMe()
-
-
+mcts.playMe()
 
 """
 root = Node(game, 0)
