@@ -102,7 +102,6 @@ class Node:
             while node.parent is not None:
                 node.visit = node.visit + 1
                 node.games = node.games + 1
-                node.wins = node.wins + 0.5
                 node = node.parent
         win = self.state.board.turn
         while node.parent is not None:
@@ -112,7 +111,7 @@ class Node:
             node.visit = node.visit + 1
             node.games = node.games + 1
             #print("hi")
-
+            """
             print("turn")
             print(win)
             print(node.state.board.turn)
@@ -121,7 +120,7 @@ class Node:
             print(node.games)
             print("wins")
             print(node.wins)
-
+            """
             node = node.parent
 
         #print("new game")
@@ -196,9 +195,11 @@ class MCTS:
         exploit = []
         for child in self.root.child:
             val = child.wins/child.games
+            print(child.wins, child.games)
             exploit.append(val)
         maxpos = exploit.index(max(exploit))
         choose = self.root.child[maxpos]
+
         return choose
 
     def playMe(self):
@@ -206,7 +207,7 @@ class MCTS:
         game = Game(board)
         newMCTS = self
         while game.checkWin() != True:
-            newMCTS.simulate(300)
+            newMCTS.simulate(100)
             choose = newMCTS.best_action()
             pos = choose.pos
             piece = Piece("red")
